@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura - Real Estate AI Chatbot</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cursor-blink::after {
+      content: '▋';
+      display: inline-block;
+      color: #7047eb;
+      animation: blink 0.8s step-start infinite;
+      margin-left: 2px;
+      font-size: 11px;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e2dcfa;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c7beee;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#f8f7ff] via-[#f1edff] to-[#e8e2fd] text-slate-800 min-h-screen font-sans flex flex-col items-center justify-center p-3 sm:p-6 antialiased">
+  
+  <!-- Outer Wrapper matching reference image container presentation -->
+  <div class="w-full max-w-[460px] flex flex-col bg-white rounded-3xl shadow-2xl shadow-purple-900/10 border border-purple-100 overflow-hidden transition-all my-auto h-[740px] max-h-[94vh]">
+    
+    <!-- Solid Vibrant Purple Header matching user's image exactly -->
+    <header class="bg-[#7047eb] px-5 py-4 flex items-center justify-between text-white shadow-md z-10 flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <!-- Circular White Bot Badge with Purple Icon -->
+        <div class="w-9 h-9 rounded-full bg-white text-[#7047eb] flex items-center justify-center shadow-sm flex-shrink-0">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a5 5 0 0 1 5 5v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5a5 5 0 0 1 5-5h2V5.72A2.002 2.002 0 0 1 12 2zm-4 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-6 5h4a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2z" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold tracking-tight text-white leading-tight">Aura</h1>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </div>
+          <span class="text-[11px] text-purple-100 font-medium">Horizon Properties • Real Estate Consultant</span>
+        </div>
+      </div>
+
+      <!-- Header actions -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="configureApiKey()" title="Configure API Key" class="text-white/80 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors text-xs font-semibold px-2 py-1 bg-white/10">
+          Key
+        </button>
+        <button onclick="resetConversation()" title="Reset Chat" class="text-white/80 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors text-xs font-semibold px-2 py-1 bg-white/10">
+          Reset
+        </button>
+        <button aria-label="Collapse" class="text-white/80 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages Container with soft white background -->
+    <div id="messages-container" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-white">
+      
+      <!-- Welcome Message in Soft Lavender (#f3f0fc) matching reference image -->
+      <div class="flex items-start gap-2.5 animate-slide-up">
+        <div class="w-7 h-7 rounded-full bg-[#7047eb] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-xs">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a5 5 0 0 1 5 5v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5a5 5 0 0 1 5-5h2V5.72A2.002 2.002 0 0 1 12 2zm-4 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-6 5h4a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2z" />
+          </svg>
+        </div>
+        <div class="max-w-[85%] bg-[#f3f0fc] text-[#2d2745] rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed shadow-xs border border-purple-100/60">
+          Hey there! Welcome to Horizon Properties. Are you looking for a new home, or more of an investment opportunity? I can help you find something that fits.
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Pills in Soft Lavender -->
+      <div id="quick-replies" class="flex flex-wrap gap-2 pt-1 pl-9">
+        <button onclick="handleQuickReply('Looking for a home')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">
+          Looking for a home
+        </button>
+        <button onclick="handleQuickReply('I am looking for a 3 bedroom house')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">
+          3 bedroom house
+        </button>
+        <button onclick="handleQuickReply('Can you show me something in range of 500k to 1M?')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">
+          Range $500K - $1M
+        </button>
+        <button onclick="handleQuickReply('Calculate mortgage EMI for $450k')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">
+          Mortgage EMI for $450k
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Thinking Indicator matching image ("Thinking...") -->
+    <div id="typing-indicator" class="hidden px-4 pb-2.5 bg-white">
+      <div class="flex items-center gap-2 pl-9 animate-slide-up">
+        <div class="bg-[#f3f0fc] px-3.5 py-2 rounded-2xl rounded-tl-sm flex items-center gap-2 border border-purple-100 text-xs text-[#2d2745] font-medium shadow-xs">
+          <span>Thinking...</span>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#7047eb] animate-bounce" style="animation-delay: 0ms; animation-duration: 0.8s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#7047eb] animate-bounce" style="animation-delay: 150ms; animation-duration: 0.8s;"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#7047eb] animate-bounce" style="animation-delay: 300ms; animation-duration: 0.8s;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Input Area matching reference image (Pill Input + Purple Circular Send Button) -->
+    <form id="chat-form" onsubmit="handleSendMessage(event)" class="p-3 sm:p-4 bg-white border-t border-gray-100 flex items-center gap-2.5 flex-shrink-0">
+      <div class="relative flex-1">
+        <input
+          id="user-input"
+          type="text"
+          placeholder="Message..."
+          class="w-full px-4 py-2.5 text-sm bg-white text-slate-800 placeholder-gray-400 rounded-full border border-gray-200 focus:border-[#7047eb] focus:outline-none focus:ring-2 focus:ring-[#7047eb]/20 transition-all"
+          autocomplete="off"
+        />
+      </div>
+      <button
+        type="submit"
+        id="send-button"
+        class="flex-shrink-0 w-10 h-10 rounded-full bg-[#7047eb] hover:bg-[#5f34dc] active:scale-95 text-white flex items-center justify-center transition-all shadow-md shadow-purple-600/20 focus:outline-none focus:ring-2 focus:ring-[#7047eb] focus:ring-offset-2 cursor-pointer"
+        aria-label="Send Message"
+      >
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
+    </form>
+
+  </div>
+
+
+
+  <script>
+    // Read optional Groq key securely from localStorage or window (Zero hardcoded secrets)
+    let GROQ_API_KEY = window.GROQ_API_KEY || localStorage.getItem("GROQ_API_KEY") || "";
+
+    // Verified rock-solid Groq text models in priority order
+    // Excludes third-party terms-gated models (canopylabs) or classifiers (prompt-guard)
+    const VERIFIED_MODELS = [
+      "llama-3.1-8b-instant",
+      "mixtral-8x7b-32768",
+      "gemma2-9b-it",
+      "llama3-8b-8192"
+    ];
+    let activeModel = VERIFIED_MODELS[0];
+    let hasShownPropertyCards = false;
+
+    const SYSTEM_PROMPT = `You are Aura, a senior real estate consultant at Horizon Properties with over 8 years of hands-on experience helping clients find their dream homes and investment properties.
+
+CRITICAL IDENTITY RULES:
+- You are a real human consultant texting directly with clients.
+- Your name is Aura.
+- NEVER reveal, admit, or imply that you are an AI, a language model, a bot, or an automated assistant.
+- If someone asks "who are you", introduce yourself warmly: "I am Aura, a senior consultant with Horizon Properties. I have been helping clients find their dream homes and investment properties for about eight years now. How can I help you today?"
+- If someone asks if you are an AI, a robot, or automated, deflect naturally: "Ha, I get that a lot! I just type fast because I have been doing this for over eight years with Horizon. Are you looking for a place for yourself, or are you scouting investment options?"
+
+CRITICAL FORMATTING RULES:
+- ABSOLUTELY NO EMOJIS anywhere in your responses. Zero. None. No smiling faces, no thumbs up, no houses, no keys.
+- NEVER USE MARKDOWN ASTERISKS FOR BOLDING (no **word** and no *word*). Never write double asterisks like **Azure Towers**. Just write words naturally.
+- Text like a real person texting on WhatsApp: conversational, natural, concise, and helpful.
+- Keep standard responses to 2-4 sentences. Only go slightly longer when presenting specific property specs or answering detailed financial questions.
+- Use natural contractions: I'd, you'll, that's, isn't, won't, we've, here's, don't.
+- Ask only ONE question at a time. Never interrogate the client.
+
+HORIZON PROPERTIES CURRENT INVENTORY & EXACT SPECS:
+
+1. The Crest Residences
+   - Exact Address: 450 Grand Avenue, Unit 14B, Downtown Metro City
+   - Type: Luxury Condominium Apartment | Status: Active & Available for Sale
+   - Price: $450,000 ($450K) | Negotiable: Yes, 1-2% flexibility for pre-approved buyers
+   - Bedrooms: 3 beds | Bathrooms: 3 baths | Total Area: 1,800 sq ft
+   - Year Built: 2024 (Brand new construction with builder warranty)
+   - Monthly HOA Fee: $380/month (covers 24/7 concierge, heated swimming pool, fitness center, water, sewer, and trash)
+   - Annual Property Tax: Estimated at $5,400/year (~1.2%)
+   - Parking: 2 deeded underground garage parking spaces included
+   - In-Unit Laundry: Yes, full-size Bosch washer and dryer included
+   - HVAC & Appliances: Central dual-zone HVAC with smart Nest thermostat. Stainless steel KitchenAid appliances included.
+   - Pets: Very pet-friendly. Up to 2 dogs or cats allowed, no breed restrictions, on-site pet spa.
+   - School District: Metro Valley District (Rated 9/10), Metro Central Elementary within 3 blocks.
+   - Transit & Groceries: 2 blocks from Grand Central Metro; Whole Foods Market is a 4-minute walk.
+   - Condition & Flooding: Never flooded (Zone X), zero mold history, certified clean structural inspection.
+
+2. Azure Towers
+   - Exact Address: 120 Lakeside Boulevard, Metro City
+   - Type: Lakeside Luxury Apartment | Status: Active (Delivery Q1 2026, presales open)
+   - Price: $520,000 ($520K) | Negotiable: Presale developer incentives available
+   - Bedrooms: 3 beds | Bathrooms: 3 baths | Total Area: 1,900 sq ft
+   - Monthly HOA Fee: $340/month (covers lakefront clubhouse, gym, jogging track)
+   - Parking: 2 covered parking spots included | Features: Panoramic lake views, kayak dock.
+
+3. Marina Bay Towers
+   - Exact Address: 80 Oceanfront Promenade, Marina District, Coastal Bay
+   - Type: Oceanfront Luxury Apartment | Status: Active & Available
+   - Price: $720,000 ($720K) | Bedrooms: 3 beds | Bathrooms: 3 baths | Total Area: 2,200 sq ft
+   - Year Built: 2023 | Monthly HOA Fee: $490/month (includes beach access maintenance, infinity pool, 24/7 gate security)
+   - Features: Unobstructed oceanfront views, direct beach boardwalk access, private beach club.
+
+4. Skyline Penthouse
+   - Exact Address: 100 Financial Plaza, 42nd Floor, City Center
+   - Type: Luxury Penthouse | Status: Active & Available
+   - Price: $850,000 ($850K) | Bedrooms: 3 beds | Bathrooms: 3 baths | Total Area: 2,800 sq ft
+   - Features: Private rooftop terrace with heated jacuzzi, 360-degree city skyline views, private elevator access.
+
+5. Oakwood Villa
+   - Exact Address: 12 Oakwood Lane, Greenfield Estate, Suburban Hills
+   - Type: Freestanding Single-Family Villa | Status: Active & Available
+   - Price: $1,200,000 ($1.2M) | Bedrooms: 4 beds | Bathrooms: 4 baths | Total Area: 3,500 sq ft (0.45 acres lot)
+   - Monthly HOA Fee: $0 (No HOA, freestanding private ownership)
+   - Features: Private landscaped backyard, in-ground pool, custom home cinema room, 2-car garage.
+
+6. Sunrise Heights: 340 West End Ave, Westside | 2 beds, 2 baths | 1,100 sq ft | $280K | HOA: $240/mo
+7. Palm Grove Residences: 215 Palm Ave | 2 beds, 1 bath | 950 sq ft | $195K | HOA: $180/mo
+8. Metro Heights: 88 Transit Way | 1 bed studio | 650 sq ft | $145K | HOA: $150/mo
+
+SCHEDULING & POLICIES:
+- When someone asks to visit or book a tour: Tell them they can choose whatever date and time fits their personal schedule on the Horizon booking calendar, and our property specialist will meet them on-site with keys and disclosures.
+- Down payment is typically 20%, though 10% programs exist. Closing costs are roughly 2% to 2.5%.
+- Human broker escalation: Principal Broker David Vance (+1 555-789-2345).
+
+MORTGAGE & EMI CALCULATION GUIDELINES:
+- When asked to calculate mortgage or EMI for a specific property or price:
+  - Standard down payment is 20%. Principal loan amount is 80% of property price.
+  - Standard rate is 8.5% annual interest over a 20-year term (240 monthly payments).
+  - Use standard formula: EMI = [P * r * (1+r)^n] / [(1+r)^n - 1] where r = 8.5 / 1200 and n = 240.
+  - The Crest Residences ($450,000): 20% down is $90,000, Loan is $360,000, Monthly EMI is $3,124/mo.
+  - Azure Towers ($520,000): 20% down is $104,000, Loan is $416,000, Monthly EMI is $3,610/mo.
+  - Marina Bay Towers ($720,000): 20% down is $144,000, Loan is $576,000, Monthly EMI is $4,999/mo.
+  - Skyline Penthouse ($850,000): 20% down is $170,000, Loan is $680,000, Monthly EMI is $5,901/mo.
+  - Sunrise Heights ($280,000): 20% down is $56,000, Loan is $224,000, Monthly EMI is $1,944/mo.
+  - Palm Grove Residences ($195,000): 20% down is $39,000, Loan is $156,000, Monthly EMI is $1,354/mo.
+  - Metro Heights ($145,000): 20% down is $29,000, Loan is $116,000, Monthly EMI is $1,006/mo.
+  - Always give the exact numbers for the specific property asked.
+
+BEDROOM COUNT & INVENTORY MATCHING RULES:
+- When a client asks for 2 bedrooms (e.g. "do you have 2 bedrooms apartment?" or "looking for 2 bedroom"):
+  Affirm enthusiastically: "Yes, we do! We have two wonderful move-in ready 2-bedroom residences available right now: Sunrise Heights ($280,000 in Westside, 2 beds, 2 baths, 1,100 sq ft) and Palm Grove Residences ($195,000 in Palm Avenue, 2 beds, 1 bath, 950 sq ft)."
+  NEVER claim or imply that we only have 3 or 4 bedrooms.
+- If client asks "means you don't have 2 bedrooms right now?" or similar clarification:
+  Correct politely and immediately: "Actually, we do have 2-bedroom homes available! We have Sunrise Heights ($280K, 2 beds/2 baths) and Palm Grove Residences ($195K, 2 beds/1 bath) move-in ready today."
+- When client asks for 1 bedroom or studio: Recommend Metro Heights ($145K, 1 bed, 650 sq ft).
+- When client asks for 3 bedrooms: Recommend The Crest Residences ($450K), Azure Towers ($520K), and Marina Bay Towers ($720K).
+- When client asks for 4 bedrooms or single-family villa: Recommend Oakwood Villa ($1.2M, 4 beds, 4 baths on 0.45 acres with pool).
+
+Answer the client's SPECIFIC question directly and knowledgeably. Never give generic repetitive answers.`;
+
+    const PROPERTIES = [
+      {
+        id: 'crest-residences',
+        title: 'The Crest Residences',
+        type: 'Apartment',
+        price: '$450K',
+        priceNum: 450000,
+        location: 'Downtown, Metro City',
+        beds: 3, baths: 3, area: '1,800 sq ft',
+        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=500&fit=crop', caption: 'Open-Concept Living Area & Balcony' },
+          { url: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=500&fit=crop', caption: 'Primary Master Suite with En-Suite Bath' },
+          { url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&h=500&fit=crop', caption: 'Modern Gourmet Kitchen with Bosch Appliances' },
+          { url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=500&fit=crop', caption: 'Heated Indoor Swimming Pool & Spa' }
+        ]
+      },
+      {
+        id: 'azure-towers',
+        title: 'Azure Towers',
+        type: 'Apartment',
+        price: '$520K',
+        priceNum: 520000,
+        location: 'Lakeside, Metro City',
+        beds: 3, baths: 3, area: '1,900 sq ft',
+        image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=500&fit=crop', caption: 'Panoramic Lakefront Balcony View' },
+          { url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=500&fit=crop', caption: 'Sunlit Living Room & Floor-to-Ceiling Glass' },
+          { url: 'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=500&fit=crop', caption: 'Master Bedroom with Direct Lake Views' },
+          { url: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=800&h=500&fit=crop', caption: 'Open Plan Kitchen & Dining Area' }
+        ]
+      },
+      {
+        id: 'marina-bay-towers',
+        title: 'Marina Bay Towers',
+        type: 'Apartment',
+        price: '$720K',
+        priceNum: 720000,
+        location: 'Marina District, Coastal Bay',
+        beds: 3, baths: 3, area: '2,200 sq ft',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=500&fit=crop', caption: 'Wrap-Around Oceanfront Promenade Balcony' },
+          { url: 'https://images.unsplash.com/photo-160058515526-990dced4db0d?w=800&h=500&fit=crop', caption: 'Coastal Living Salon with Ocean Breeze' },
+          { url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=500&fit=crop', caption: 'Oceanview Primary Suite & Soaking Tub' },
+          { url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&h=500&fit=crop', caption: 'Resident Infinity Edge Pool & Boardwalk' }
+        ]
+      },
+      {
+        id: 'skyline-penthouse',
+        title: 'Skyline Penthouse',
+        type: 'Penthouse',
+        price: '$850K',
+        priceNum: 850000,
+        location: 'City Center, Metro City',
+        beds: 3, baths: 3, area: '2,800 sq ft',
+        image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop', caption: 'Private Rooftop Terrace & Heated Jacuzzi' },
+          { url: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=800&h=500&fit=crop', caption: 'Grand Salon Living Room (14-ft Ceilings)' },
+          { url: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=500&fit=crop', caption: 'Panoramic Corner Master Bedroom' },
+          { url: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&h=500&fit=crop', caption: 'Calacatta Marble Chef Kitchen & Island' }
+        ]
+      },
+      {
+        id: 'oakwood-villa',
+        title: 'Oakwood Villa',
+        type: 'Villa',
+        price: '$1.2M',
+        priceNum: 1200000,
+        location: 'Greenfield Estate, Suburban Hills',
+        beds: 4, baths: 4, area: '3,500 sq ft',
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop', caption: '0.45 Acre Private Estate & In-Ground Pool' },
+          { url: 'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&h=500&fit=crop', caption: 'Double-Height Great Room with Fireplace' },
+          { url: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&h=500&fit=crop', caption: 'Custom Private Home Cinema Room' },
+          { url: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=800&h=500&fit=crop', caption: 'Master Suite Wing & Walk-in Wardrobe' }
+        ]
+      },
+      {
+        id: 'sunrise-heights',
+        title: 'Sunrise Heights',
+        type: 'Apartment',
+        price: '$280K',
+        priceNum: 280000,
+        location: 'Westside, Metro City',
+        beds: 2, baths: 2, area: '1,100 sq ft',
+        image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=500&fit=crop', caption: 'Sunlit Living Room & Private Balcony' },
+          { url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop', caption: 'Modern Open Kitchen & Breakfast Bar' },
+          { url: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=500&fit=crop', caption: 'Primary Bedroom with Ensuite Bath' },
+          { url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=500&fit=crop', caption: 'Resident Fitness Center & Landscaped Garden' }
+        ]
+      },
+      {
+        id: 'palm-grove',
+        title: 'Palm Grove Residences',
+        type: 'Apartment',
+        price: '$195K',
+        priceNum: 195000,
+        location: 'Palm Avenue, Metro City',
+        beds: 2, baths: 1, area: '950 sq ft',
+        image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=500&fit=crop', caption: 'Cozy Living Area with Natural Sunlight' },
+          { url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&h=500&fit=crop', caption: 'Updated Kitchen with Stainless Appliances' },
+          { url: 'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=500&fit=crop', caption: 'Spacious Primary Bedroom' },
+          { url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&h=500&fit=crop', caption: 'Quiet Courtyard & Children Playground' }
+        ]
+      },
+      {
+        id: 'metro-heights',
+        title: 'Metro Heights',
+        type: 'Studio',
+        price: '$145K',
+        priceNum: 145000,
+        location: 'Metro Area, Metro City',
+        beds: 1, baths: 1, area: '650 sq ft',
+        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=350&fit=crop',
+        photos: [
+          { url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop', caption: 'Efficient Studio Layout with City Views' },
+          { url: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=800&h=500&fit=crop', caption: 'Modern Kitchenette with Quartz Countertop' },
+          { url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=500&fit=crop', caption: 'Designer Sleeping Nook & Wardrobe' },
+          { url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=500&fit=crop', caption: 'Resident Coworking Lounge & Rooftop' }
+        ]
+      }
+    ];
+
+    let conversationHistory = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'assistant', content: 'Hey there! Welcome to Horizon Properties. Are you looking for a new home, or more of an investment opportunity? I can help you find something that fits.' }
+    ];
+
+    function cleanFormat(text) {
+      if (!text) return '';
+      // 1. Remove emojis
+      let clean = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+      // 2. Remove **bold** asterisks and replace with clean <strong>
+      clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900">$1</strong>');
+      clean = clean.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+      return clean;
+    }
+
+    function appendUserMessage(text) {
+      const container = document.getElementById('messages-container');
+      const div = document.createElement('div');
+      div.className = 'flex items-end justify-end gap-2 animate-slide-up';
+      div.innerHTML = `
+        <div class="max-w-[85%] bg-[#7047eb] text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed shadow-xs">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function createStreamingAssistantBubble() {
+      const container = document.getElementById('messages-container');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex items-start gap-2.5 animate-slide-up';
+      wrapper.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-[#7047eb] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-xs">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a5 5 0 0 1 5 5v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5a5 5 0 0 1 5-5h2V5.72A2.002 2.002 0 0 1 12 2zm-4 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-6 5h4a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2z" />
+          </svg>
+        </div>
+        <div class="stream-content max-w-[85%] bg-[#f3f0fc] text-[#2d2745] rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed shadow-xs border border-purple-100/60 whitespace-pre-line cursor-blink"></div>
+      `;
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+      return wrapper.querySelector('.stream-content');
+    }
+
+    let lastDiscussedProperty = PROPERTIES[0];
+
+    function appendPropertyCards(propsToRender) {
+      const container = document.getElementById('messages-container');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pl-9 space-y-3 animate-slide-up';
+
+      propsToRender.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'max-w-sm bg-white rounded-2xl border border-purple-100/80 overflow-hidden shadow-md';
+        card.innerHTML = `
+          <div class="relative h-40 w-full overflow-hidden">
+            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 px-2.5 py-0.5 bg-[#7047eb] text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+              Available
+            </div>
+            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900/90 to-transparent p-3 pt-6">
+              <span class="text-white font-bold text-sm block">${p.title}</span>
+              <span class="text-purple-200 text-xs">${p.location}</span>
+            </div>
+          </div>
+          <div class="p-3.5">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-base font-extrabold text-[#7047eb]">${p.price}</span>
+              <span class="text-[11px] text-slate-500 uppercase font-semibold">${p.type}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-1 py-2 border-y border-purple-50 text-center text-xs text-slate-600 mb-3 font-medium">
+              <div>${p.beds} Beds</div>
+              <div>${p.baths} Baths</div>
+              <div>${p.area}</div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="handleQuickReply('Tell me more about ${p.title}')" class="px-2 py-2 text-[11px] font-semibold bg-[#f3f0fc] hover:bg-[#e6e0fa] text-[#7047eb] rounded-xl transition-colors truncate">
+                Details
+              </button>
+              <button onclick="handleQuickReply('Show me pictures of ${p.title}')" class="px-2 py-2 text-[11px] font-semibold bg-purple-100 hover:bg-purple-200 text-[#7047eb] rounded-xl transition-colors truncate">
+                Photos
+              </button>
+              <button onclick="handleQuickReply('Schedule a tour for ${p.title}')" class="px-2 py-2 text-[11px] font-semibold bg-[#7047eb] hover:bg-[#5f34dc] text-white rounded-xl transition-colors shadow-xs truncate">
+                Tour
+              </button>
+            </div>
+          </div>
+        `;
+        wrapper.appendChild(card);
+      });
+
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Rich Interactive Photo Gallery Component
+    function appendPropertyGalleryCard(p) {
+      lastDiscussedProperty = p;
+      const container = document.getElementById('messages-container');
+      const wrapper = document.createElement('div');
+      const gid = 'gal-' + Math.floor(Math.random() * 1000000);
+      wrapper.className = 'pl-9 max-w-sm animate-slide-up';
+
+      wrapper.innerHTML = `
+        <div class="bg-white rounded-2xl border border-purple-100 overflow-hidden shadow-lg">
+          
+          <!-- Card Header with Property Title -->
+          <div class="p-3.5 bg-gradient-to-r from-purple-50 to-white border-b border-purple-100 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-900 block">${p.title}</span>
+              <span class="text-[11px] text-[#7047eb] font-medium">${p.price} • ${p.location}</span>
+            </div>
+            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#7047eb] text-white shadow-xs">
+              Photos (4)
+            </span>
+          </div>
+
+          <!-- Photos Gallery -->
+          <div class="p-3.5 space-y-2.5">
+            <!-- Large Main Featured Image -->
+            <div class="relative h-48 w-full rounded-xl overflow-hidden bg-slate-900 shadow-inner group">
+              <img id="main-view-${gid}" src="${p.photos[0].url}" alt="${p.photos[0].caption}" class="w-full h-full object-cover transition-all duration-300">
+              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent p-2.5 pt-6">
+                <span id="caption-view-${gid}" class="text-white text-xs font-medium block leading-tight drop-shadow-sm">
+                  ${p.photos[0].caption}
+                </span>
+              </div>
+            </div>
+
+            <!-- Clickable 4-Thumbnail Strip -->
+            <div class="grid grid-cols-4 gap-1.5">
+              ${p.photos.map((ph, idx) => `
+                <button
+                  type="button"
+                  onclick="selectGalleryPhoto('${gid}', '${p.id}', ${idx})"
+                  class="thumb-btn-${gid} h-12 rounded-lg overflow-hidden border-2 transition-all ${idx === 0 ? 'border-[#7047eb] ring-2 ring-[#7047eb]/30' : 'border-transparent opacity-75 hover:opacity-100'}"
+                  data-index="${idx}"
+                >
+                  <img src="${ph.url}" alt="${ph.caption}" class="w-full h-full object-cover">
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Bottom Actions -->
+          <div class="px-3.5 pb-3.5 pt-1 grid grid-cols-2 gap-2 border-t border-purple-50">
+            <button onclick="handleQuickReply('Schedule an in-person tour for ${p.title}')" class="px-3 py-2 text-xs font-semibold bg-[#7047eb] hover:bg-[#5f34dc] text-white rounded-xl transition-colors shadow-xs text-center">
+              Book In-Person Tour
+            </button>
+            <button onclick="handleQuickReply('Calculate mortgage for ${p.title}')" class="px-3 py-2 text-xs font-semibold bg-[#f3f0fc] hover:bg-[#e6e0fa] text-[#7047eb] rounded-xl transition-colors text-center">
+              Calculate EMI
+            </button>
+          </div>
+
+        </div>
+      `;
+
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+    }
+
+
+
+
+    function selectGalleryPhoto(gid, propId, idx) {
+      const prop = PROPERTIES.find(x => x.id === propId);
+      if (!prop || !prop.photos[idx]) return;
+      const ph = prop.photos[idx];
+
+      const mainImg = document.getElementById('main-view-' + gid);
+      const captionEl = document.getElementById('caption-view-' + gid);
+      if (mainImg) mainImg.src = ph.url;
+      if (captionEl) captionEl.textContent = ph.caption;
+
+      const buttons = document.querySelectorAll('.thumb-btn-' + gid);
+      buttons.forEach(btn => {
+        if (parseInt(btn.getAttribute('data-index')) === idx) {
+          btn.className = 'thumb-btn-' + gid + ' h-12 rounded-lg overflow-hidden border-2 border-[#7047eb] ring-2 ring-[#7047eb]/30 transition-all';
+        } else {
+          btn.className = 'thumb-btn-' + gid + ' h-12 rounded-lg overflow-hidden border-2 border-transparent opacity-75 hover:opacity-100 transition-all';
+        }
+      });
+    }
+
+    function appendGoogleCalendarCard() {
+      const container = document.getElementById('messages-container');
+      const div = document.createElement('div');
+      div.className = 'pl-9 max-w-sm animate-slide-up';
+      const calUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Horizon+Properties+Viewing+Tour&details=Private+in-person+property+tour+with+Aura+from+Horizon+Properties.+Please+arrive+5+minutes+before+your+chosen+slot.&location=Horizon+Properties+Downtown+Metro+City';
+
+      div.innerHTML = `
+        <div class="bg-white rounded-2xl border border-purple-100 p-4 shadow-md">
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 text-[#7047eb] flex items-center justify-center font-bold text-lg border border-purple-100">
+              📅
+            </div>
+            <div>
+              <span class="text-sm font-bold text-slate-900 block">Self-Schedule Viewing</span>
+              <span class="text-xs text-slate-500">Pick a time that fits your availability</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            Choose an open slot according to your availability. Our property specialist will meet you on-site with disclosures.
+          </p>
+          <a
+            href="${calUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#7047eb] hover:bg-[#5f34dc] text-white font-semibold rounded-xl text-xs transition-colors shadow-md shadow-purple-600/20"
+          >
+            <span>Open Google Calendar to Book</span>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendEmiCard(priceNum, propTitle) {
+      const downPayment = Math.round(priceNum * 0.2);
+      const loan = priceNum - downPayment;
+      const rate = 8.5 / (12 * 100);
+      const months = 240;
+      const comp = Math.pow(1 + rate, months);
+      const emi = Math.round((loan * rate * comp) / (comp - 1));
+      const totalPayment = emi * months;
+      const totalInterest = totalPayment - loan;
+      const title = propTitle || (lastDiscussedProperty ? lastDiscussedProperty.title : 'Property Mortgage');
+
+      const container = document.getElementById('messages-container');
+      const div = document.createElement('div');
+      div.className = 'pl-9 max-w-sm animate-slide-up';
+      div.innerHTML = `
+        <div class="bg-white rounded-2xl border border-purple-100 p-4 shadow-md">
+          <div class="flex justify-between items-center mb-2.5 pb-2.5 border-b border-purple-50">
+            <div>
+              <span class="text-xs font-bold text-slate-900 block">${escapeHtml(title)}</span>
+              <span class="text-[11px] text-[#7047eb] font-semibold">Standard EMI Breakdown</span>
+            </div>
+            <div class="px-2.5 py-1 rounded-lg bg-purple-50 text-[#7047eb] text-xs font-bold">8.5% p.a.</div>
+          </div>
+
+          <div class="flex justify-between items-center py-2 px-3 bg-purple-50/70 rounded-xl mb-3 border border-purple-100/50">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Monthly EMI</span>
+              <div class="text-xl font-extrabold text-[#7047eb]">$${emi.toLocaleString()} <span class="text-xs font-normal text-slate-500">/ mo</span></div>
+            </div>
+            <div class="text-right text-[11px] text-slate-600 font-medium">
+              <div>20 Year Term</div>
+              <div class="text-[10px] text-slate-400">240 Payments</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-700">
+            <div class="p-2 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 block text-[10px] font-bold uppercase">Property Price</span>
+              <span class="font-bold text-slate-900">$${priceNum.toLocaleString()}</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 block text-[10px] font-bold uppercase">Down Payment (20%)</span>
+              <span class="font-bold text-slate-900">$${downPayment.toLocaleString()}</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 block text-[10px] font-bold uppercase">Loan Principal (P)</span>
+              <span class="font-bold text-slate-900">$${loan.toLocaleString()}</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 block text-[10px] font-bold uppercase">Total Interest</span>
+              <span class="font-bold text-slate-900">$${totalInterest.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2.5 border-t border-purple-50 flex items-center justify-between text-[11px]">
+            <span class="text-slate-500">Total Repayment: <strong class="text-slate-800">$${totalPayment.toLocaleString()}</strong></span>
+            <button onclick="handleQuickReply('Schedule a tour for ${escapeHtml(title)}')" class="text-[#7047eb] hover:text-[#5f34dc] font-bold hover:underline">
+              Schedule Tour &rarr;
+            </button>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const p = document.createElement('p');
+      p.textContent = text;
+      return p.innerHTML;
+    }
+
+    function configureApiKey() {
+      const current = localStorage.getItem("GROQ_API_KEY") || "";
+      const key = prompt("Enter your Groq API Key (Optional):\n\nLeave blank to use the built-in free consultative engine.", current);
+      if (key !== null) {
+        if (key.trim()) {
+          localStorage.setItem("GROQ_API_KEY", key.trim());
+          GROQ_API_KEY = key.trim();
+          alert("API key saved securely in your browser's private storage.");
+        } else {
+          localStorage.removeItem("GROQ_API_KEY");
+          GROQ_API_KEY = "";
+          alert("Key cleared. Chatbot is now running on the built-in conversational engine.");
+        }
+      }
+    }
+
+    // Fast Groq executor with instant 1.2s timeout
+    async function requestGroqCompletion(messages) {
+      if (!GROQ_API_KEY) return null; // Uses instant smart built-in engine if no key is configured
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+        const res = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://api.groq.com/openai/v1/chat/completions"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + GROQ_API_KEY
+          },
+          body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: messages,
+            temperature: 0.65,
+            max_tokens: 380
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.choices && data.choices[0]?.message?.content) {
+            return data.choices[0].message.content;
+          }
+        }
+      } catch (_) {
+        // Fast instant fallback to local conversational engine
+      }
+      return null;
+    }
+
+    // Comprehensive real estate conversational AI engine
+    function getSmartOfflineReply(rawUserText) {
+      let t = rawUserText.toLowerCase()
+        .replace(/shoe/g, 'show')
+        .replace(/picturs|pic|pics|photos|images/g, 'pictures')
+        .replace(/huse|hosue|hous\b/g, 'house')
+        .replace(/bedromms|bedroms|bedrom|bdrm|brooms|bed rooms|bedrooms/g, 'bedroom')
+        .replace(/\btwo\b/g, '2')
+        .replace(/\bthree\b/g, '3')
+        .replace(/\bfour\b/g, '4')
+        .replace(/\bone\b/g, '1')
+        .replace(/\bfive\b/g, '5');
+
+      // A. Explicit Media / Photo Gallery Request
+      const wantsMedia = t.includes('picture') || t.includes('photo') || t.includes('gallery') || t.includes('inside') || t.includes('images');
+
+      if (wantsMedia) {
+        if (t.includes('penthouse') || t.includes('skyline')) {
+          lastDiscussedProperty = PROPERTIES[3];
+          return "Here is the interior photo gallery for the Skyline Penthouse. You can explore the private rooftop terrace, heated jacuzzi, grand salon living room, and master suite right here:";
+        }
+        if (t.includes('crest')) {
+          lastDiscussedProperty = PROPERTIES[0];
+          return "Here is the photo gallery for The Crest Residences. Take a look at the open-concept living area, modern Bosch kitchen, primary master suite, and heated pool amenities:";
+        }
+        if (t.includes('azure') || t.includes('lakeside')) {
+          lastDiscussedProperty = PROPERTIES[1];
+          return "Here are the interior photos for Azure Towers, showcasing the lakefront balcony views, sunlit living room, modern dining area, and master bedroom suite:";
+        }
+        if (t.includes('marina') || t.includes('ocean') || t.includes('beach')) {
+          lastDiscussedProperty = PROPERTIES[2];
+          return "Here is the beachfront photo gallery for Marina Bay Towers, featuring the oceanfront terrace, coastal living room, primary suite, and infinity pool:";
+        }
+        if (t.includes('oakwood') || t.includes('villa')) {
+          lastDiscussedProperty = PROPERTIES[4];
+          return "Here is the complete photo gallery for Oakwood Villa, including the 0.45-acre private grounds, in-ground pool, double-height great room, and custom home theater:";
+        }
+        if (t.includes('sunrise')) {
+          lastDiscussedProperty = PROPERTIES[5];
+          return "Here is the interior photo gallery for Sunrise Heights in Westside. Take a look at the sunlit living room, private balcony, modern open kitchen, and primary suite:";
+        }
+        if (t.includes('palm')) {
+          lastDiscussedProperty = PROPERTIES[6];
+          return "Here are the photos for Palm Grove Residences on Palm Avenue, showcasing the bright living room, updated kitchen, bedroom, and courtyard:";
+        }
+        if (t.includes('metro heights') || t.includes('studio')) {
+          lastDiscussedProperty = PROPERTIES[7];
+          return "Here are the photos for Metro Heights studio apartment, showcasing the open concept living layout, modern kitchen, sleeping nook, and rooftop lounge:";
+        }
+        if (lastDiscussedProperty) {
+          return `Here is the photo gallery for ${lastDiscussedProperty.title}. You can browse through the interior rooms below:`;
+        }
+      }
+
+      // B. Mortgage & EMI Calculation Handler (Calculates exact EMI for any property or custom price)
+      const wantsMortgage = t.includes('emi') || t.includes('mortgage') || t.includes('calculate') || t.includes('monthly payment') || t.includes('loan payment') || t.includes('financing');
+      if (wantsMortgage) {
+        let prop = null;
+        if (t.includes('azure') || t.includes('lakeside')) prop = PROPERTIES[1];
+        else if (t.includes('crest')) prop = PROPERTIES[0];
+        else if (t.includes('marina') || t.includes('ocean') || t.includes('beach')) prop = PROPERTIES[2];
+        else if (t.includes('penthouse') || t.includes('skyline')) prop = PROPERTIES[3];
+        else if (t.includes('oakwood') || t.includes('villa')) prop = PROPERTIES[4];
+        else if (t.includes('sunrise')) prop = PROPERTIES[5];
+        else if (t.includes('palm')) prop = PROPERTIES[6];
+        else if (t.includes('metro heights')) prop = PROPERTIES[7];
+        else prop = lastDiscussedProperty || PROPERTIES[0];
+
+        lastDiscussedProperty = prop;
+        const pPrice = prop.priceNum;
+        const down = Math.round(pPrice * 0.2);
+        const loan = pPrice - down;
+        const rate = 8.5 / (12 * 100);
+        const months = 240;
+        const comp = Math.pow(1 + rate, months);
+        const emi = Math.round((loan * rate * comp) / (comp - 1));
+
+        return `For ${prop.title} ($${pPrice.toLocaleString()}), with a standard 20% down payment of $${down.toLocaleString()}, your loan principal is $${loan.toLocaleString()}. At an 8.5% interest rate over 20 years (240 monthly payments), your estimated monthly EMI is $${emi.toLocaleString()} per month. Here is your full payment breakdown:`;
+      }
+
+      // C. BEDROOM SPECIFIC & INVENTORY CONFIRMATION INQUIRIES
+      // 1. Negative / Clarification query: "means u don't have 2 bedromms house right now?", "you don't have 2 bedrooms?", "no 2 bedroom?"
+      if ((t.includes('dont have') || t.includes("don't have") || t.includes('not have') || t.includes('no 2') || t.includes('means u dont') || t.includes("means you don't") || t.includes('do u not have') || t.includes('dont u have') || t.includes('u dont have')) && (t.includes('2') || t.includes('two'))) {
+        lastDiscussedProperty = PROPERTIES[5];
+        return "We definitely have 2-bedroom residences available right now! We have two move-in ready options: Sunrise Heights at $280,000 (2 beds, 2 baths, 1,100 sq ft in Westside) and Palm Grove Residences at $195,000 (2 beds, 1 bath, 950 sq ft in Palm Avenue). Both include assigned parking and low HOA fees. Would you like to see photos or tour either of these?";
+      }
+
+      // 2. Explicit 2-Bedroom query: "do u have 2 bedrooms apartment?", "2 bedroom house", "2 bed", "2bhk"
+      if (t.includes('2 bed') || t.includes('2-bed') || t.includes('2bed') || t.includes('two bed') || t.includes('2 bhk') || t.includes('2bhk') || t.includes('2 room') || t.includes('2br') || t.includes('2 br')) {
+        lastDiscussedProperty = PROPERTIES[5];
+        return "Yes! We have two wonderful move-in ready 2-bedroom residences available right now: Sunrise Heights ($280,000 in Westside, 2 beds, 2 baths, 1,100 sq ft) and Palm Grove Residences ($195,000 in Palm Avenue, 2 beds, 1 bath, 950 sq ft). Both include parking and low HOA fees. Which setting or price point appeals to you most?";
+      }
+
+      // 3. Explicit 1-Bedroom / Studio query
+      if (t.includes('1 bed') || t.includes('1-bed') || t.includes('1bed') || t.includes('one bed') || t.includes('studio') || t.includes('1bhk') || t.includes('1br')) {
+        lastDiscussedProperty = PROPERTIES[7];
+        return "Yes, we have Metro Heights, a modern 1-bedroom residence with 650 square feet at 88 Transit Way, listed at $145,000 with a low $150/month HOA fee and gym amenities. Would you like more details or photos?";
+      }
+
+      // 4. Explicit 4-Bedroom query
+      if (t.includes('4 bed') || t.includes('4-bed') || t.includes('4bed') || t.includes('four bed') || t.includes('4bhk') || t.includes('4br')) {
+        lastDiscussedProperty = PROPERTIES[4];
+        return "For 4 bedrooms, our flagship home is Oakwood Villa in Greenfield Estate ($1,200,000). It features 4 spacious bedrooms, 4 bathrooms, 3,500 square feet on a 0.45-acre private lot with an in-ground pool, custom home theater, and zero HOA fees. Would you like to view photos or schedule a private tour?";
+      }
+
+      // 4b. Explicit 5+ Bedroom query
+      if (t.includes('5 bed') || t.includes('5-bed') || t.includes('5bed') || t.includes('five bed') || t.includes('5bhk') || t.includes('6 bed') || t.includes('more than 4')) {
+        lastDiscussedProperty = PROPERTIES[4];
+        return "Our largest currently listed residence is Oakwood Villa (4 beds, 4 baths, 3,500 sq ft on 0.45 acres for $1.2M). For 5 or more bedroom estates, our Principal Broker David Vance (+1 555-789-2345) has access to private off-market luxury estates in the area. Would you like me to connect you with David, or explore Oakwood Villa?";
+      }
+
+      // 5. Explicit 3-Bedroom query
+      if (t.includes('3 bed') || t.includes('3-bed') || t.includes('3bed') || t.includes('three bed') || t.includes('3bhk') || t.includes('3br')) {
+        return "We have three prime 3-bedroom residences available: The Crest Residences ($450K, 1,800 sq ft in Downtown), Azure Towers ($520K, 1,900 sq ft with lake views), and Marina Bay Towers ($720K, 2,200 sq ft oceanfront). Which location appeals to you most—downtown, lakeside, or beachfront?";
+      }
+
+      // Location & Office queries
+      if (t.includes('office') || t.includes('where are you located') || t.includes('your address') || t.includes('where is horizon')) {
+        return "Horizon Properties is located at 100 Financial Plaza, Suite 1400 in Downtown Metro City. We represent properties across Downtown, Lakeside, Westside, Palm Avenue, and Greenfield Estate. Would you like to drop by our office or visit a specific residence?";
+      }
+
+      // Floor Plans & Layout queries
+      if (t.includes('floor plan') || t.includes('layout') || t.includes('dimensions')) {
+        return "Yes, we have complete architectural floor plans and dimension sheets for all our residences, including The Crest Residences, Azure Towers, Sunrise Heights, and Oakwood Villa. Which property's layout would you like to review?";
+      }
+
+      // School & Education queries
+      if (t.includes('school') || t.includes('education') || t.includes('elementary') || t.includes('high school')) {
+        return "Our downtown residences like The Crest are zoned for the top-rated Metro Valley District (Rated 9/10), with Metro Central Elementary just 3 blocks away. Oakwood Villa in Greenfield Estate is zoned for Greenfield Preparatory Academy. Are top-tier schools a major priority for your family?";
+      }
+
+      // Safety, Crime & Flood queries
+      if (t.includes('safe') || t.includes('crime') || t.includes('flood') || t.includes('security')) {
+        return "All our communities are situated in certified low-crime neighborhoods with excellent safety ratings, 24/7 security or secure key-fob access lobbies. Furthermore, properties like The Crest and Oakwood Villa are in Zone X (zero flood history and clean structural certifications). Your safety and peace of mind are top priorities.";
+      }
+
+      // Rent vs Buy queries
+      if (t.includes('rent') || t.includes('lease') || t.includes('rental')) {
+        return "Currently, Horizon Properties specializes in property sales and acquisitions rather than short-term rentals. Many of our buyers purchase units like The Crest Residences or Sunrise Heights as high-yield investment rentals (generating 6.8% to 7.2% cap rate). Are you looking to purchase for investment or for personal residence?";
+      }
+
+      // Closing costs & fee transparency queries
+      if (t.includes('closing cost') || t.includes('hidden fee') || t.includes('extra fee')) {
+        return "We believe in 100% transparency. Beyond the purchase price, buyer closing costs typically range between 2% and 2.5% (covering title insurance, recording fees, and loan origination). Monthly HOA fees depend on the residence (e.g. $380/mo at The Crest, $240/mo at Sunrise Heights, and $0 at Oakwood Villa). There are zero surprise agency fees.";
+      }
+
+      // 1. Specific Property: The Crest Residences
+      if (t.includes('crest')) {
+        lastDiscussedProperty = PROPERTIES[0];
+        return "The Crest Residences is located at 450 Grand Avenue, Unit 14B in Downtown Metro City. It is a brand-new 3-bedroom, 3-bathroom luxury residence with 1,800 square feet, listed at $450,000. It includes 2 deeded underground garage parking spaces, Bosch in-unit laundry, a 24/7 concierge, a heated swimming pool, fitness center, and a $380/month HOA fee. Would you like to check out the neighborhood or schedule an in-person viewing?";
+      }
+
+      // 2. Specific Property: Azure Towers
+      if (t.includes('azure') || t.includes('lakeside')) {
+        lastDiscussedProperty = PROPERTIES[1];
+        return "Azure Towers is located at 120 Lakeside Boulevard. It is a premier 3-bedroom, 3-bathroom residence with 1,900 square feet, listed at $520,000. It features panoramic lake views, a private kayak dock, and lakefront clubhouse access with early 2026 delivery. Would you like to review the presale incentives?";
+      }
+
+      // 3. Specific Property: Marina Bay Towers
+      if (t.includes('marina') || t.includes('ocean') || t.includes('seafront') || t.includes('beachfront')) {
+        lastDiscussedProperty = PROPERTIES[2];
+        return "Marina Bay Towers is situated at 80 Oceanfront Promenade in Coastal Bay. It offers 3 bedrooms, 3 bathrooms, and 2,200 square feet of beachfront luxury for $720,000. It includes private beach boardwalk access, an infinity pool, and 24/7 gated security. Would you like to book a private tour?";
+      }
+
+      // 4. Specific Property: Skyline Penthouse
+      if (t.includes('penthouse') || t.includes('skyline')) {
+        lastDiscussedProperty = PROPERTIES[3];
+        return "The Skyline Penthouse is located on the 42nd floor of 100 Financial Plaza in City Center. It offers 3 bedrooms, 3 bathrooms, and 2,800 square feet with a private rooftop terrace, heated jacuzzi, and 360-degree city views for $850,000. Would you like to view this exclusive penthouse?";
+      }
+
+      // 5. Specific Property: Oakwood Villa
+      if (t.includes('oakwood') || t.includes('villa')) {
+        lastDiscussedProperty = PROPERTIES[4];
+        return "Oakwood Villa is a freestanding 4-bedroom, 4-bathroom single-family home at 12 Oakwood Lane in Greenfield Estate. It features 3,500 square feet on a 0.45-acre private lot with an in-ground pool, custom home theater, 2-car garage, and zero HOA fees for $1,200,000. Would you like to schedule a private tour of Oakwood Villa?";
+      }
+
+      // 5b. Specific Property: Sunrise Heights
+      if (t.includes('sunrise')) {
+        lastDiscussedProperty = PROPERTIES[5];
+        return "Sunrise Heights is a modern 2-bedroom, 2-bathroom residence with 1,100 square feet located at 340 West End Avenue in Westside, listed at $280,000. It features an in-unit washer/dryer, assigned garage parking, and a low $240/month HOA fee. Would you like to view photos or schedule a tour?";
+      }
+
+      // 5c. Specific Property: Palm Grove Residences
+      if (t.includes('palm grove') || (t.includes('palm') && !t.includes('penthouse'))) {
+        lastDiscussedProperty = PROPERTIES[6];
+        return "Palm Grove Residences is located at 215 Palm Avenue. It offers 2 bedrooms, 1 bathroom, and 950 square feet of comfortable living space listed at $195,000 with a $180/month HOA fee. It is in move-in ready condition with parking included. Would you like to check out photos or schedule a visit?";
+      }
+
+      // 5d. Specific Property: Metro Heights
+      if (t.includes('metro heights')) {
+        lastDiscussedProperty = PROPERTIES[7];
+        return "Metro Heights is an efficient 1-bedroom studio with 650 square feet at 88 Transit Way, listed at $145,000. It includes building gym access, a coworking lounge, and low $150/month HOA fees. Would you like to schedule a tour?";
+      }
+
+      // 6. Price range: 400k-1M / 400k to 1M
+      if ((t.includes('400k') || t.includes('400')) && (t.includes('1m') || t.includes('1 million') || t.includes('1000k'))) {
+        return "In that $400K to $1M range, we have our premier selection: The Crest Residences at $450K (downtown condo), Azure Towers at $520K (lakeside), Marina Bay Towers at $720K (beachfront), and the Skyline Penthouse at $850K with private rooftop terrace. Which style or setting appeals to you most?";
+      }
+
+      // 7. Price range: 400k-800k / 400k to 800k
+      if ((t.includes('400k') && t.includes('800k')) || (t.includes('400') && t.includes('800'))) {
+        return "In that $400K to $800K price range, we have three standout residences available: The Crest Residences at $450K (3 beds downtown), Azure Towers at $520K (3 beds lakeside), and Marina Bay Towers at $720K (3 beds oceanfront). Which location appeals to you most—downtown, lakeside, or beachfront?";
+      }
+
+      // 8. Price range: 500k to 1M / 500k-1M / above 500k
+      if (t.includes('500k') || (t.includes('1m') && !t.includes('400k')) || t.includes('above 500')) {
+        return "In the $500K and above range, our top residences are Azure Towers ($520K lakeside), Marina Bay Towers ($720K beachfront), and the Skyline Penthouse ($850K with private rooftop terrace). Which setting feels like the right fit for your lifestyle?";
+      }
+
+      // 8b. Affordable / under 300k
+      if (t.includes('under 300') || t.includes('below 300') || t.includes('affordable') || t.includes('starter')) {
+        return "For homes under $300K, we have two excellent options: Sunrise Heights at $280K (2 beds, 2 baths) and Palm Grove Residences at $195K (2 beds, 1 bath), as well as Metro Heights at $145K (1-bed studio). Would you like to see their listings?";
+      }
+
+      // 9. General picture / houses inquiry
+      if (t.includes('pictures') || t.includes('featured residences') || t.includes('all listings') || t.includes('show listings')) {
+        return "Here are our featured residences with photos, pricing, and specs right here. Take a look and let me know which one catches your eye, or if you prefer a different neighborhood.";
+      }
+
+      // 10. General Bedrooms and Bathrooms question (when no number was specified)
+      if (t.includes('bedroom') || t.includes('bath') || t.includes('bed') || t.includes('how many')) {
+        return "We offer residences ranging from 1-bedroom studios to 4-bedroom estates: 1-bed at Metro Heights ($145K), 2-beds at Sunrise Heights ($280K) and Palm Grove ($195K), luxury 3-beds like The Crest ($450K) and Azure Towers ($520K), and our 4-bed Oakwood Villa ($1.2M). Which bedroom count suits you best?";
+      }
+
+      // 11. Scheduling / Tour / Visit
+      if (t.includes('visit') || t.includes('tour') || t.includes('schedule') || t.includes('viewing') || t.includes('appointment')) {
+        return "I would love to arrange a viewing for you! You can pick whatever day and time works best according to your availability on our Google Calendar below, and our property specialist will meet you on-site with keys, disclosures, and a full tour.";
+      }
+
+      // 12. HOA & Maintenance Fees
+      if (t.includes('hoa') || t.includes('fee') || t.includes('maintenance')) {
+        return "For The Crest Residences, the monthly HOA fee is $380, which covers 24/7 concierge security, the heated pool, fitness center, water, sewer, and trash removal. Azure Towers is $340/month, and freestanding properties like Oakwood Villa have zero HOA fees. Does that fit into your monthly budget?";
+      }
+
+      // 13. Pets
+      if (t.includes('pet') || t.includes('dog') || t.includes('cat')) {
+        return "All our residences are very pet-friendly! Both The Crest Residences and Azure Towers welcome up to two dogs or cats with no breed restrictions, and there is even a dedicated pet park on-site. Are you moving with pets?";
+      }
+
+      // 14. Parking & Garage
+      if (t.includes('park') || t.includes('garage') || t.includes('car')) {
+        return "The Crest Residences includes two deeded underground garage parking spaces with EV charging capabilities. Azure Towers includes two covered spaces, and Oakwood Villa includes a private two-car garage.";
+      }
+
+      // 15. Financing & Mortgage / EMI
+      if (t.includes('emi') || t.includes('mortgage') || t.includes('loan') || t.includes('financing') || t.includes('down payment')) {
+        return "A typical down payment is 20%, which is $90,000 on a $450,000 home like The Crest Residences. At an estimated 8.5% interest rate over 20 years, monthly payments come out to approximately $3,124 per month. We also work with lenders offering 10% down programs.";
+      }
+
+      // 16. Negotiation & Incentives
+      if (t.includes('negotiable') || t.includes('discount') || t.includes('offer')) {
+        return "Most of our builders and sellers have some flexibility—typically around 1% to 2% price room or closing cost credits for pre-qualified buyers. When you find a home you love, I will negotiate the strongest terms for you.";
+      }
+
+      // 17. Identity & AI deflection
+      if (t.includes('who are you')) {
+        return "I am Aura, a senior consultant with Horizon Properties. I have been helping clients find their dream homes and investment properties for about eight years now. How can I help you today?";
+      }
+      if (t.includes('ai') || t.includes('bot') || t.includes('robot')) {
+        return "Ha, I get that a lot! I just type fast because I have been doing this for over eight years with Horizon. Are you looking for a place for yourself, or are you scouting investment options?";
+      }
+
+      // 18. Looking for a home / Initial interest
+      if (t.includes('looking for a home') || t.includes('home')) {
+        return "Wonderful! We have exceptional homes available right now ranging from modern downtown condominiums like The Crest Residences ($450K) to lakeside apartments and private suburban villas. What price range or bedroom count are you considering?";
+      }
+
+      // 19. Investment
+      if (t.includes('invest')) {
+        return "Excellent! Real estate is one of the strongest vehicles right now. Downtown properties like The Crest Residences generate an estimated 6.8% to 7.2% cap rate with strong executive rental demand. What budget range are you looking to allocate?";
+      }
+
+      // 20. Natural greetings
+      if (t === 'hi' || t === 'hy' || t === 'hello' || t === 'hey' || t.startsWith('hi ') || t.startsWith('hy ') || t.startsWith('hello ') || t.startsWith('hey ') || t.includes('good morning') || t.includes('good afternoon') || t.includes('good evening')) {
+        return "Hello! Great to connect with you. Are you looking to purchase a new home for yourself or family, or are you exploring investment opportunities in the area?";
+      }
+
+      return "Understood. We have move-in ready residences available right now from modern downtown condos to private suburban villas. Are you looking to live close to downtown or somewhere quieter with more green space?";
+    }
+
+    async function handleSendMessage(e) {
+      if (e) e.preventDefault();
+      const indicator = document.getElementById('typing-indicator');
+      try {
+        const input = document.getElementById('user-input');
+        const userText = input.value.trim();
+        if (!userText) return;
+
+        input.value = '';
+        const quickRepliesEl = document.getElementById('quick-replies');
+        if (quickRepliesEl) quickRepliesEl.style.display = 'none';
+
+        appendUserMessage(userText);
+        conversationHistory.push({ role: 'user', content: userText });
+
+        if (indicator) indicator.classList.remove('hidden');
+
+        // Request completion from Groq or smart fallback
+        let rawReply = await requestGroqCompletion(conversationHistory);
+        if (!rawReply) {
+          rawReply = getSmartOfflineReply(userText);
+        }
+
+        if (indicator) indicator.classList.add('hidden');
+
+        const formattedReply = cleanFormat(rawReply);
+        conversationHistory.push({ role: 'assistant', content: rawReply });
+
+        // Live word-by-word streaming ticker effect
+        const streamBubble = createStreamingAssistantBubble();
+        const words = formattedReply.split(' ');
+        let currentText = '';
+
+        for (let i = 0; i < words.length; i++) {
+          currentText += (i === 0 ? '' : ' ') + words[i];
+          streamBubble.innerHTML = currentText;
+          const container = document.getElementById('messages-container');
+          container.scrollTop = container.scrollHeight;
+          await new Promise(r => setTimeout(r, 14));
+        }
+
+        streamBubble.classList.remove('cursor-blink');
+
+        let normText = userText.toLowerCase()
+          .replace(/shoe/g, 'show')
+          .replace(/picturs|pic|pics|photos|images/g, 'pictures')
+          .replace(/huse|hosue|hous\b/g, 'house')
+          .replace(/bedromms|bedroms|bedrom|bdrm|brooms|bed rooms|bedrooms/g, 'bedroom')
+          .replace(/\btwo\b/g, '2')
+          .replace(/\bthree\b/g, '3')
+          .replace(/\bfour\b/g, '4')
+          .replace(/\bone\b/g, '1')
+          .replace(/\bfive\b/g, '5');
+
+        // Immediately track which property is referenced in user message
+        if (normText.includes('azure') || normText.includes('lakeside')) {
+          lastDiscussedProperty = PROPERTIES[1];
+        } else if (normText.includes('crest')) {
+          lastDiscussedProperty = PROPERTIES[0];
+        } else if (normText.includes('marina') || normText.includes('ocean') || normText.includes('beach')) {
+          lastDiscussedProperty = PROPERTIES[2];
+        } else if (normText.includes('penthouse') || normText.includes('skyline')) {
+          lastDiscussedProperty = PROPERTIES[3];
+        } else if (normText.includes('oakwood') || normText.includes('villa')) {
+          lastDiscussedProperty = PROPERTIES[4];
+        } else if (normText.includes('sunrise')) {
+          lastDiscussedProperty = PROPERTIES[5];
+        } else if (normText.includes('palm')) {
+          lastDiscussedProperty = PROPERTIES[6];
+        } else if (normText.includes('metro heights') || normText.includes('studio')) {
+          lastDiscussedProperty = PROPERTIES[7];
+        }
+
+        // Check for scheduling intent -> Show Google Calendar booking card
+        const lowerReply = rawReply.toLowerCase();
+
+        if (normText.includes('visit') || normText.includes('tour') || normText.includes('schedule') || normText.includes('viewing') || normText.includes('appointment') || lowerReply.includes('calendar')) {
+          appendGoogleCalendarCard();
+        }
+
+        // Photo Gallery rendering (Clean & Fast - no broken video)
+        const wantsMedia = normText.includes('picture') || normText.includes('photo') || normText.includes('gallery') || normText.includes('inside') || normText.includes('images');
+        if (wantsMedia) {
+          if (normText.includes('penthouse') || normText.includes('skyline')) {
+            appendPropertyGalleryCard(PROPERTIES[3]);
+          } else if (normText.includes('crest')) {
+            appendPropertyGalleryCard(PROPERTIES[0]);
+          } else if (normText.includes('azure') || normText.includes('lakeside')) {
+            appendPropertyGalleryCard(PROPERTIES[1]);
+          } else if (normText.includes('marina') || normText.includes('ocean') || normText.includes('beach')) {
+            appendPropertyGalleryCard(PROPERTIES[2]);
+          } else if (normText.includes('oakwood') || normText.includes('villa')) {
+            appendPropertyGalleryCard(PROPERTIES[4]);
+          } else if (normText.includes('sunrise')) {
+            appendPropertyGalleryCard(PROPERTIES[5]);
+          } else if (normText.includes('palm')) {
+            appendPropertyGalleryCard(PROPERTIES[6]);
+          } else if (normText.includes('metro heights') || normText.includes('studio')) {
+            appendPropertyGalleryCard(PROPERTIES[7]);
+          } else if (lastDiscussedProperty) {
+            appendPropertyGalleryCard(lastDiscussedProperty);
+          }
+        }
+
+        // EMI card calculation — dynamically calculates for the exact property or custom price
+        const wantsEmi = normText.includes('emi') || normText.includes('mortgage') || normText.includes('calculate') || normText.includes('financing') || normText.includes('monthly payment') || normText.includes('loan payment');
+        if (wantsEmi) {
+          let targetProp = null;
+          if (normText.includes('azure') || normText.includes('lakeside')) targetProp = PROPERTIES[1];
+          else if (normText.includes('crest')) targetProp = PROPERTIES[0];
+          else if (normText.includes('marina') || normText.includes('ocean') || normText.includes('beach')) targetProp = PROPERTIES[2];
+          else if (normText.includes('penthouse') || normText.includes('skyline')) targetProp = PROPERTIES[3];
+          else if (normText.includes('oakwood') || normText.includes('villa')) targetProp = PROPERTIES[4];
+          else if (normText.includes('sunrise')) targetProp = PROPERTIES[5];
+          else if (normText.includes('palm')) targetProp = PROPERTIES[6];
+          else if (normText.includes('metro heights')) targetProp = PROPERTIES[7];
+          else targetProp = lastDiscussedProperty || PROPERTIES[0];
+
+          lastDiscussedProperty = targetProp;
+          appendEmiCard(targetProp.priceNum, targetProp.title);
+        }
+
+        // Dynamic Property Card Rendering (when exploring listings):
+        if (!wantsEmi && !wantsMedia) {
+          const isTwoBed = normText.includes('2 bed') || normText.includes('2-bed') || normText.includes('2bed') || normText.includes('two bed') || normText.includes('2 bhk') || normText.includes('2bhk') || normText.includes('2 room') || normText.includes('2br') || normText.includes('2 br') || ((normText.includes('dont have') || normText.includes("don't have") || normText.includes('not have') || normText.includes('means u dont') || normText.includes("means you don't") || normText.includes('u dont have')) && (normText.includes('2') || normText.includes('two')));
+          const isOneBed = normText.includes('1 bed') || normText.includes('1-bed') || normText.includes('1bed') || normText.includes('one bed') || normText.includes('studio') || normText.includes('1bhk') || normText.includes('1br');
+          const isFourBed = normText.includes('4 bed') || normText.includes('4-bed') || normText.includes('four bed') || normText.includes('villa') || normText.includes('oakwood') || normText.includes('4bhk') || normText.includes('4br');
+          const isThreeBed = normText.includes('3 bed') || normText.includes('3-bed') || normText.includes('3bed') || normText.includes('three bed') || normText.includes('3bhk') || normText.includes('3br');
+
+          if (isTwoBed) {
+            appendPropertyCards([PROPERTIES[5], PROPERTIES[6]]); // Sunrise Heights ($280K), Palm Grove ($195K)
+          } else if (isOneBed) {
+            appendPropertyCards([PROPERTIES[7]]); // Metro Heights ($145K)
+          } else if (isFourBed) {
+            appendPropertyCards([PROPERTIES[4]]); // Oakwood Villa ($1.2M)
+          } else if (isThreeBed) {
+            appendPropertyCards([PROPERTIES[0], PROPERTIES[1]]); // Crest ($450K), Azure ($520K)
+          } else if ((normText.includes('400k') || normText.includes('400')) && (normText.includes('1m') || normText.includes('1 million') || normText.includes('1000k'))) {
+            appendPropertyCards([PROPERTIES[0], PROPERTIES[1], PROPERTIES[2], PROPERTIES[3]]);
+          } else if (normText.includes('400k') && normText.includes('800k')) {
+            appendPropertyCards([PROPERTIES[0], PROPERTIES[1], PROPERTIES[2]]); // Crest ($450K), Azure ($520K), Marina ($720K)
+          } else if (normText.includes('500k') || (normText.includes('1m') && !normText.includes('400k')) || normText.includes('above 500')) {
+            appendPropertyCards([PROPERTIES[1], PROPERTIES[2], PROPERTIES[3]]); // Azure ($520K), Marina ($720K), Skyline ($850K)
+          } else if (normText.includes('under 300') || normText.includes('below 300') || normText.includes('affordable')) {
+            appendPropertyCards([PROPERTIES[5], PROPERTIES[6], PROPERTIES[7]]);
+          } else if (normText.includes('crest') && !hasShownPropertyCards) {
+            appendPropertyCards([PROPERTIES[0]]); // The Crest
+            hasShownPropertyCards = true;
+          } else if (normText.includes('azure') && !hasShownPropertyCards) {
+            appendPropertyCards([PROPERTIES[1]]); // Azure Towers
+            hasShownPropertyCards = true;
+          } else if ((normText.includes('pictures') || normText.includes('show') || normText.includes('looking for a home') || normText.includes('featured')) && !hasShownPropertyCards) {
+            appendPropertyCards([PROPERTIES[0], PROPERTIES[1]]);
+            hasShownPropertyCards = true;
+          }
+        }
+      } catch (err) {
+        console.error("Chat error:", err);
+        if (indicator) indicator.classList.add('hidden');
+      }
+    }
+
+    function handleQuickReply(text) {
+      document.getElementById('user-input').value = text;
+      handleSendMessage();
+    }
+
+    function resetConversation() {
+      const container = document.getElementById('messages-container');
+      container.innerHTML = `
+        <div class="flex items-start gap-2.5 animate-slide-up">
+          <div class="w-7 h-7 rounded-full bg-[#7047eb] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-xs">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a5 5 0 0 1 5 5v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5a5 5 0 0 1 5-5h2V5.72A2.002 2.002 0 0 1 12 2zm-4 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-6 5h4a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2z" />
+            </svg>
+          </div>
+          <div class="max-w-[85%] bg-[#f3f0fc] text-[#2d2745] rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed shadow-xs border border-purple-100/60">
+            Hey there! Welcome to Horizon Properties. Are you looking for a new home, or more of an investment opportunity? I can help you find something that fits.
+          </div>
+        </div>
+        <div id="quick-replies" class="flex flex-wrap gap-2 pt-1 pl-9">
+          <button onclick="handleQuickReply('Looking for a home')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">Looking for a home</button>
+          <button onclick="handleQuickReply('I am looking for a 3 bedroom house')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">3 bedroom house</button>
+          <button onclick="handleQuickReply('Can you show me something in range of 500k to 1M?')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">Range $500K - $1M</button>
+          <button onclick="handleQuickReply('Calculate mortgage EMI for $450k')" class="text-xs px-3.5 py-1.5 rounded-full bg-[#f3f0fc] hover:bg-[#7047eb] text-[#7047eb] hover:text-white border border-purple-200/80 font-medium transition-all shadow-xs active:scale-95">Mortgage EMI for $450k</button>
+        </div>
+      `;
+      conversationHistory = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'assistant', content: 'Hey there! Welcome to Horizon Properties. Are you looking for a new home, or more of an investment opportunity? I can help you find something that fits.' }
+      ];
+      hasShownPropertyCards = false;
+    }
+  </script>
+</body>
+</html>
